@@ -29,8 +29,7 @@ export default function SignInForm() {
       // Redirect to the return URL or default page
       router.push(returnUrl);
     } catch (error) {
-      console.error("Authentication failed:", error.code, error.message);
-      alert("Login failed: " + error.message); // Display error message to the user
+      router.push('./InvalidLogin')
     }
   };
 
