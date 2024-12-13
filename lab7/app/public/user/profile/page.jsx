@@ -2,7 +2,7 @@
 import { getAuth, onAuthStateChanged, updateProfile } from "firebase/auth";
 import React, { useState, useEffect } from "react";
 
-export default function RegisterPage() {
+export default function profilePage() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [photoURL, setPhotoURL] = useState(""); // Initially empty; updated after user fetch
@@ -58,6 +58,7 @@ export default function RegisterPage() {
     <div className="card card-side bg-base-100 shadow-xl">
       <figure>
         <img
+          style={{ width: "150px", height: "150px", objectFit: "cover" }}
           src={photoURL || "https://via.placeholder.com/150"}
           alt="Profile picture"
         />
@@ -74,8 +75,9 @@ export default function RegisterPage() {
           value={photoURL}
           onChange={handleInputChange}
           placeholder="Enter Photo URL"
+          
         />
-        <button type="submit" style={{ color: "white" }}>
+        <button type="submit" >
           Submit
         </button>
       </form>

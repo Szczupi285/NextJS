@@ -1,7 +1,7 @@
 "use client";
 
 import "./globals.css";
-import { AuthProvider } from "@/app//lib/AuthContext";
+import { AuthProvider } from "@/app/lib/AuthContext";
 import { useEffect, useState } from "react";
 import { getAuth, onAuthStateChanged, signOut } from "firebase/auth";
 import { useRouter } from "next/navigation";
@@ -22,7 +22,7 @@ export default function RootLayout({ children }) {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
-      setLoading(false) // Set user state
+      setLoading(false); // Set user state
     });
     return () => unsubscribe(); // Cleanup listener
   }, [auth]);
@@ -30,6 +30,7 @@ export default function RootLayout({ children }) {
   if (loading) {
     return <div>Loading...</div>; // You can customize this placeholder
   }
+
   // Logout handler
   const handleLogout = async () => {
     try {
@@ -61,32 +62,31 @@ export default function RootLayout({ children }) {
               className="drawer-overlay"
             ></label>
             <ul className="menu bg-base-200 text-base-content min-h-full w-80 p-4">
-              {/* Sidebar content here */}
-              {!user &&
-              (
+              {!user && (
                 <div>
                   <li>
-                  <button onClick={() => handleNavigation("/public/user/register")}>Register</button>
-                </li>
-                <li>
-                  <button onClick={() => handleNavigation("/public/user/signin")}>Login</button>
-                </li>
-              </div>
+                    <button onClick={() => handleNavigation("/public/user/register")}>
+                      Register
+                    </button>
+                  </li>
+                  <li>
+                    <button onClick={() => handleNavigation("/public/user/signin")}>
+                      Login
+                    </button>
+                  </li>
+                </div>
               )}
-             
-              {/* Show Logout button only when user is logged in */}
               {user && (
                 <div>
-                <li>
-                  <button
-                    onClick={handleLogout}>
-                    Logout
-                  </button>
-                </li>
-                <li>
-                <button onClick={() => handleNavigation("/public/user/profile")}>Profile</button>
-              </li>
-              </div>
+                  <li>
+                    <button onClick={handleLogout}>Logout</button>
+                  </li>
+                  <li>
+                    <button onClick={() => handleNavigation("/public/user/profile")}>
+                      Profile
+                    </button>
+                  </li>
+                </div>
               )}
             </ul>
           </div>
