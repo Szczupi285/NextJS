@@ -1,18 +1,32 @@
 "use client";
 import { getAuth, onAuthStateChanged, updateProfile } from "firebase/auth";
+import { doc, setDoc, getDoc } from "firebase/firestore";
+import { db } from "@/app/lib/firebase";
 import React, { useState, useEffect } from "react";
 
-export default function profilePage() {
+export default function ProfilePage() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [photoURL, setPhotoURL] = useState(""); // Initially empty; updated after user fetch
+  const [photoURL, setPhotoURL] = useState("");
+  const [address, setAddress] = useState({
+    street: "",
+    city: "",
+    zipCode: "",
+  });
 
   useEffect(() => {
     const auth = getAuth();
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
         setUser(user);
-        setPhotoURL(user.photoURL || ""); // Set initial photoURL
+        setPhotoURL(user.photoURL || "");
+
+        // Fetch address from Firestore
+        const docRef = doc(db, "users", user.uid);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+          setAddress(docSnap.data().address || {});
+        }
       } else {
         setUser(null);
       }
@@ -22,7 +36,15 @@ export default function profilePage() {
   }, []);
 
   const handleInputChange = (e) => {
-    setPhotoURL(e.target.value);
+    const { name, value } = e.target;
+    if (name === "photoURL") {
+      setPhotoURL(value);
+    } else {
+      setAddress({
+        ...address,
+        [name]: value,
+      });
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -34,12 +56,18 @@ export default function profilePage() {
 
     try {
       const auth = getAuth();
+      // Update photo URL
       await updateProfile(auth.currentUser, { photoURL });
-      alert("Profile photo updated successfully!");
+
+      // Update address in Firestore
+      const docRef = doc(db, "users", user.uid);
+      await setDoc(docRef, { address }, { merge: true });
+
+      alert("Profile updated successfully!");
       setUser({ ...auth.currentUser }); // Update user state to reflect changes
     } catch (error) {
-      console.error("Error updating profile photo:", error);
-      alert("Failed to update profile photo.");
+      console.error("Error updating profile:", error);
+      alert("Failed to update profile.");
     }
   };
 
@@ -70,16 +98,55 @@ export default function profilePage() {
         </div>
       </div>
       <form onSubmit={handleSubmit}>
-        <input
-          type="text"
-          value={photoURL}
-          onChange={handleInputChange}
-          placeholder="Enter Photo URL"
-          
-        />
-        <button type="submit" >
-          Submit
-        </button>
+        <div>
+          <label>
+            Photo URL:
+            <input
+              type="text"
+              name="photoURL"
+              value={photoURL}
+              onChange={handleInputChange}
+              placeholder="Enter Photo URL"
+            />
+          </label>
+        </div>
+        <div>
+          <label>
+            Street:
+            <input
+              type="text"
+              name="street"
+              value={address.street}
+              onChange={handleInputChange}
+              placeholder="Enter Street"
+            />
+          </label>
+        </div>
+        <div>
+          <label>
+            City:
+            <input
+              type="text"
+              name="city"
+              value={address.city}
+              onChange={handleInputChange}
+              placeholder="Enter City"
+            />
+          </label>
+        </div>
+        <div>
+          <label>
+            Zip Code:
+            <input
+              type="text"
+              name="zipCode"
+              value={address.zipCode}
+              onChange={handleInputChange}
+              placeholder="Enter Zip Code"
+            />
+          </label>
+        </div>
+        <button type="submit">Submit</button>
       </form>
     </div>
   );

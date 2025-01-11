@@ -85,6 +85,9 @@ export default function RootLayout({ children }) {
                     <button onClick={() => handleNavigation("/public/user/profile")}>
                       Profile
                     </button>
+                    <button onClick={() => handleNavigation("/public/user/books")}>
+                      Books
+                    </button>
                   </li>
                 </div>
               )}
